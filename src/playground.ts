@@ -268,10 +268,25 @@ function makeGUI() {
     state.showTestData = this.checked;
     state.serialize();
     userHasInteracted();
-    heatMap.updateTestPoints(state.showTestData ? testData : []);
+
+    if (state.showTestData) {
+      heatMap.updateTestPoints(testData);
+    } else {
+      heatMap.updatePoints(trainData);
+    }
+//      heatMap.updateTestPoints(state.showTestData ? testData : []);
+
   });
+
   // Check/uncheck the checkbox according to the current state.
   showTestData.property("checked", state.showTestData);
+
+  // Display initial data based on the initial state of 'showTestData'.
+  if (state.showTestData) {
+    heatMap.updateTestPoints(testData);
+  } else {
+    heatMap.updatePoints(trainData);
+  }
 
   let discretize = d3.select("#discretize").on("change", function() {
     state.discretize = this.checked;

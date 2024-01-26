@@ -41,6 +41,7 @@ export class HeatMap {
   private color;
   private canvas;
   private svg;
+  private displayingTestData: boolean; // tracking which data set to display
 
   constructor(
       width: number, numSamples: number, xDomain: [number, number],
@@ -56,6 +57,8 @@ export class HeatMap {
         this.settings[prop] = userSettings[prop];
       }
     }
+
+    this.displayingTestData = false; // initialize to display trainingdata only
 
     this.xScale = d3.scale.linear()
       .domain(xDomain)
@@ -139,6 +142,13 @@ export class HeatMap {
     if (this.settings.noSvg) {
       throw Error("Can't add points since noSvg=true");
     }
+
+    if (!this.displayingTestData) {
+      // Clear training data points
+      this.svg.select("g.train").selectAll("circle").data([]).exit().remove();
+    }
+      
+    this.displayingTestData = true;
     this.updateCircles(this.svg.select("g.test"), points);
   }
 
@@ -146,6 +156,13 @@ export class HeatMap {
     if (this.settings.noSvg) {
       throw Error("Can't add points since noSvg=true");
     }
+
+    if (this.displayingTestData) {
+      // Clear test data points only if they are currently displayed
+      this.svg.select("g.test").selectAll("circle").data([]).exit().remove();
+    }
+    
+    this.displayingTestData = false;
     this.updateCircles(this.svg.select("g.train"), points);
   }
 
